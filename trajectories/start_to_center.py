@@ -6,15 +6,19 @@ class StartToCenterTrajectory(Trajectory):
         super().__init__(camera)
 
     def run(self):
-        self.__drive_to_marker(3)
+        self.__drive_to_marker(2, 60_000)
 
         arduino.write("CY:-90;")
 
-        self.__drive_to_marker(1)
+        self.__drive_to_marker(1, 60_000)
 
-        arduino.write("CY:0;")
+        arduino.write("CY:-180;")
 
-    def __drive_to_marker(self, target_marker_id: int):
+        self.__drive_to_marker(2, 1_000, True)
+
+
+
+    def __drive_to_marker(self, target_marker_id: int, target_area: int, reverse: bool = False):
         while True:
             _, id, x, area = self.camera.read_marker()
 
@@ -24,7 +28,7 @@ class StartToCenterTrajectory(Trajectory):
             if id != target_marker_id:
                 continue
 
-            if area >= 60_000:
+            if (area >= target_area and not reverse) or (area <= target_area and reverse):
                 arduino.write("CS:0;")
                 return
 
@@ -33,4 +37,4 @@ class StartToCenterTrajectory(Trajectory):
             elif x > 350:
                 arduino.write("CR:50;")
             else:
-                arduino.write("CF:100;")
+                arduino.write("CF:100;") if not reverse else arduino.write("CB:100;")
