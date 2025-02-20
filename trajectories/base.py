@@ -1,6 +1,6 @@
 from camera import Camera
 
-class AbstractTrajectory:
+class Trajectory:
     def __init__(self, camera: Camera):
         pass
 

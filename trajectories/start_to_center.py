@@ -1,7 +1,7 @@
-from trajectories.ABC import AbstractTrajectory
+from trajectories.base import Trajectory
 import arduino
 
-class StartToCenterTrajectory(AbstractTrajectory):
+class StartToCenterTrajectory(Trajectory):
     def __init__(self, camera):
         super().__init__(camera)
 
