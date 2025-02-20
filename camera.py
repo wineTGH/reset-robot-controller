@@ -15,7 +15,7 @@ class Camera:
     def release(self):
         self.cap.release()
     
-    def read_marker(self) -> tuple[MatLike, int, int, int] | tuple[MatLike, None, None, None]:
+    def read_marker(self, target_id: int) -> tuple[MatLike, int, int, int] | tuple[MatLike, None, None, None]:
         _, self.image = self.cap.read()
 
         gray = cv.cvtColor(self.image, cv.COLOR_BGR2GRAY)
@@ -25,15 +25,20 @@ class Camera:
             self.show_image()
             return self.image, None, None, None
         
-        aruco.drawDetectedMarkers(self.image, corners)
+        data_id = self.get_index(ids, target_id)
+        if data_id is None:
+            self.show_image()
+            return self.image, None, None, None
+        
+        aruco.drawDetectedMarkers(self.image, [corners[data_id]])
         self.show_image()
         
-        area = cv.contourArea(corners[0])
-        moments = cv.moments(corners[0])
+        area = cv.contourArea(corners[data_id])
+        moments = cv.moments(corners[data_id])
 
         x = int(moments["m10"]/moments["m00"]) if moments["m00"] != 0 else 320
 
-        return self.image, int(ids[0]), x, area
+        return self.image, int(ids[data_id]), x, area
     
     def show_image(self):
         if self.image is not None:
@@ -41,6 +46,12 @@ class Camera:
 
         return cv.waitKey(1) & 0xFF == ord('q')
             
+    def get_index(self, ids: MatLike, target_id: int):
+        for i in range(len(ids)):
+            if int(ids[i]) == target_id:
+                return i
         
+        return None
+
     def __del__(self, *args, **kwargs):
         self.cap.release()
