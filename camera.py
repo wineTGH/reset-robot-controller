@@ -16,22 +16,31 @@ class Camera:
         self.cap.release()
     
     def read_marker(self) -> tuple[MatLike, int, int, int] | tuple[MatLike, None, None, None]:
-        _, image = self.cap.read()
+        _, self.image = self.cap.read()
 
-        gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+        gray = cv.cvtColor(self.image, cv.COLOR_BGR2GRAY)
         corners, ids, rejected = self.detector.detectMarkers(gray)
 
         if ids is None:
-            return image, None, None, None
+            self.show_image()
+            return self.image, None, None, None
         
-        aruco.drawDetectedMarkers(image, corners)
-
+        aruco.drawDetectedMarkers(self.image, corners)
+        self.show_image()
+        
         area = cv.contourArea(corners[0])
         moments = cv.moments(corners[0])
 
         x = int(moments["m10"]/moments["m00"]) if moments["m00"] != 0 else 320
 
-        return image, ids[0], x, area
+        return self.image, int(ids[0]), x, area
     
+    def show_image(self):
+        if self.image is not None:
+            cv.imshow("Camera", self.image)
+
+        return cv.waitKey(1) & 0xFF == ord('q')
+            
+        
     def __del__(self, *args, **kwargs):
         self.cap.release()
