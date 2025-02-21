@@ -14,7 +14,7 @@ class StartToCenterTrajectory(Trajectory):
 
         arduino.write("CY:-180;")
 
-        self.__drive_to_marker(2, 1_000, True, ranges=(230, 245))
+        self.__drive_to_marker(2, 1_500, True, ranges=(210, 220))
 
 
 
@@ -37,4 +37,4 @@ class StartToCenterTrajectory(Trajectory):
             elif x > ranges[1]:
                 arduino.write("CR:50;")
             else:
-                arduino.write("CF:100;") if not reverse else arduino.write("CB:100;")
+                arduino.write("CF:50;") if not reverse else arduino.write("CB:50;")

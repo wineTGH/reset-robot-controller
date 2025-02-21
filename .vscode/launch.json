@@ -9,7 +9,7 @@
             "type": "debugpy",
             "request": "attach",
             "connect": {
-                "host": "reset-robot.local",
+                "host": "kvant.local",
                 "port": 5678,
             },
             "preLaunchTask": "Robot: Deploy and run debugger",
