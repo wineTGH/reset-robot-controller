@@ -7,7 +7,6 @@ class BoxesTrajectory(Trajectory):
 
     def run(self):
         self.drive_to_qr_code()
-        arduino.write("MY:-180;")
 
     def drive_to_qr_code(self):
         while True:
