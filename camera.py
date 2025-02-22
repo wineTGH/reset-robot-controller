@@ -43,7 +43,7 @@ class Camera:
 
         return self.image, int(ids[data_id]), x, area
     
-    def read_qr(self, target_data: str):
+    def read_qr(self, target_data: str = None):
         _, self.image = self.cap.read()
         gray = cv.cvtColor(self.image, cv.COLOR_BGR2GRAY)
         
@@ -53,7 +53,7 @@ class Camera:
             self.show_image()
             return self.image, None, None, None
         
-        if data != target_data:
+        if target_data is not None and data != target_data:
             self.show_image()
             return self.image, None, None, None
         
