@@ -1,2 +1,3 @@
 from trajectories.start_to_center import StartToCenterTrajectory
 from trajectories.boxes import BoxesTrajectory
+from trajectories.first_boxes_to_finish import FirstBoxesToFinish
