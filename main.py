@@ -8,5 +8,5 @@ BoxesTrajectory(camera_platform).run()
 FirstBoxesToFinish(camera_move).run()
 
 # while True:
-#     camera_move.read_marker(1)
-#     camera_platform.read_marker(1)
+    # print(camera_move.read_marker(2))
+    # print(camera_platform.read_marker(1))

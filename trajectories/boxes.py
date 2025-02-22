@@ -10,9 +10,6 @@ class BoxesTrajectory(Trajectory):
 
     def drive_to_qr_code(self):
         while True:
-            if arduino.ser.in_waiting:
-                print(arduino.ser.readline())
-            
             image, data, x, area = self.camera.read_qr()
 
             if not data or data != "прокладки":
