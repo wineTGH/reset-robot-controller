@@ -21,6 +21,9 @@ class Camera:
     def read_marker(self, target_id: int) -> tuple[MatLike, int, int, int] | tuple[MatLike, None, None, None]:
         _, self.image = self.cap.read()
 
+        if self.image is None:
+            return None, None, None, None
+
         gray = cv.cvtColor(self.image, cv.COLOR_BGR2GRAY)
         corners, ids, rejected = self.aruco_detector.detectMarkers(gray)
 
