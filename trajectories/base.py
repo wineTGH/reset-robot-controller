@@ -1,20 +1,24 @@
 from camera import Camera
-import arduino
+from arduino import arduino
 
 class Trajectory:
-    def __init__(self, camera: Camera):
+    def __init__(self, camera: Camera, camera_qr: Camera = None, camera_grab: Camera = None):
         self.camera = camera
+        self.camera_qr = camera_qr
+        self.camera_grab = camera_grab
 
     def run(self):
         pass
 
-
-    def drive_to_marker(self, target_marker_id: int, target_area: int, reverse: bool = False, ranges: tuple[int, int] = (250, 350)):
+    def drive_to_marker(self, target_marker_id: int, target_area: int, reverse: bool = False, ranges: tuple[int, int] = (250, 350), camera: Camera = None):
+        if not camera:
+            camera = self.camera
+        
         while True:
             if arduino.ser.in_waiting:
                 print(arduino.ser.read())
 
-            _, id, x, area = self.camera.read_marker(target_marker_id)
+            _, id, x, area = camera.read_marker(target_marker_id)
 
             if id is None:
                 continue

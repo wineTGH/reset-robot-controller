@@ -48,6 +48,9 @@ class Camera:
     
     def read_qr(self, target_data: str = None):
         _, self.image = self.cap.read()
+        if self.image is None:
+            return None, None, None, None
+        
         gray = cv.cvtColor(self.image, cv.COLOR_BGR2GRAY)
         
         data, points, _ = self.qr_detector.detectAndDecode(gray)
