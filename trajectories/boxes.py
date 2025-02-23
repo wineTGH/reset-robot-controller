@@ -15,44 +15,41 @@ class BoxesTrajectory(Trajectory):
         self.drive_to_qr_code()
 
     def drive_to_qr_code(self):
-        count = 0
         while True:
-            image, data, x, area = self.camera_qr.read_qr()
+            _, data, _, _ = self.camera_qr.read_qr()
 
             if not data:
                 arduino.write("MF:20;")
                 continue
 
             arduino.write("MS:0;")
+            self.grab_lower_part()
 
             arduino.write("PG:500;")
-            
-            while True:
-                _, data, _, _ = self.camera_grab.read_qr()
-                if data:
-                    break
-            
-            arduino.write("PA:1;")
-            time.sleep(10)
-            
-            arduino.write("PP:1;")
-            time.sleep(20)
-            arduino.write("PG:200;")
             time.sleep(4)
-            servo.write("GO;")
-            time.sleep(2)
             
-            servo.write("PF;")
-            time.sleep(2)
-            
-            servo.write("GC;")
-            time.sleep(1)
-            
-            servo.write("PB;")
-
-            time.sleep(2)
-            arduino.write("PA:0;")
-            arduino.write("PP:-1;")
-            time.sleep(15)
-
-            return
+            _, data, _, _ = self.camera_grab.read_qr()
+            self.grab_higher_part()
+        
+    def grab_lower_part(self):
+        arduino.write("PG:140;")
+        servo.write("GO;")
+        time.sleep(2)
+        servo.write("PF;")
+        time.sleep(3)
+        servo.write("GC;")
+    
+    def grab_higher_part(self):
+        arduino.write("PP:1;")
+        time.sleep(16)
+        arduino.write("PG:430;")
+        time.sleep(4)
+        servo.write("GO;")
+        time.sleep(2)
+        servo.write("PF;")
+        time.sleep(5)
+        servo.write("GC;")
+        arduino.write("PA:1;")
+        time.sleep(10)
+        servo.write("PB;")
+        arduino.write("PA:0;")
