@@ -1,16 +1,20 @@
 import serial
 import time
-ser = serial.Serial('/dev/ttyACM0', 9600)
-time.sleep(2)
 
-previous_command = "CS:0;"
-
-def write(command: str):
-    global previous_command
+class Arduino:
+    previous_command = "CS:0;"
     
-    if command != previous_command:
-        ser.write(command.encode())
-        print(command)
+    def __init__(self, port: str):
+        self.ser = serial.Serial(port, 9600)
+        time.sleep(2)
 
-    previous_command = command
 
+    def write(self, command: str):
+        if command != self.previous_command:
+            self.ser.write(command.encode())
+            print(command)
+
+        self.previous_command = command
+
+arduino = Arduino("/dev/ttyACM0")
+servo = Arduino("/dev/ttyACM1")
