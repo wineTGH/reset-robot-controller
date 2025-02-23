@@ -1,5 +1,5 @@
 from trajectories.base import Trajectory
-import arduino
+from arduino import arduino
 
 class StartToCenterTrajectory(Trajectory):
     def __init__(self, camera):
