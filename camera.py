@@ -16,15 +16,28 @@ class Camera:
         self.qr_detector = cv.QRCodeDetector()
 
     def release(self):
+        """выключение камеры"""
         self.cap.release()
 
-    def read_marker(
-        self, target_id: int
-    ) -> (
-        tuple[MatLike, int, int, int]
+    def read_marker(self, target_id: int) -> (
+        tuple[None, None, None, None]
         | tuple[MatLike, None, None, None]
-        | tuple[None, None, None, None]
+        | tuple[MatLike, int, int, int]
     ):
+        """
+        Фукнция чтение ArUco маркера с текущей камеры
+
+        Аргументы:
+        ----------
+            - target_id (int): ID искомого маркера. Все маркеры с иными ID игнорируются
+
+        Возвращает:
+        ----------
+            - image (MatLike | None): изображение с камеры. None если камера не вернула изображение
+            - id (int | None): ID искомого маркера. None если маркер не был найден
+            - x (int | None): Центр маркера по координате X. None если маркер не был найден
+            - area (int | None): Площадь искомого маркера. None если маркер не был найден
+        """
         _, self.image = self.cap.read()
 
         if self.image is None:
@@ -52,9 +65,29 @@ class Camera:
 
         return self.image, int(ids[data_id]), x, area
 
-    def read_qr(self, target_data: str = None):
-        _, self.image = self.cap.read()
+    def read_qr(
+        self, target_data: str = None
+    ) -> (
+        tuple[None, None, None, None]
+        | tuple[MatLike, None, None, None]
+        | tuple[MatLike, str, int, int]
+    ):
+        """
+        Фукнция чтение QR кода с текущей камеры
         
+        Аргументы:
+        ----------
+            - target_data (str, optional): Данные на искомом QR-коде. Если аргумент не установлен, программа ищет любой код
+
+        Возвращает:
+        ----------
+            - image (MatLike | None): изображение с камеры. None если камера не вернула изображение
+            - data (str | None): Данные с QR кода. None если код не был найден
+            - x (int | None): Центр QR кода по координате X. None если код не был найден
+            - area (int | None): Площадь искомого QR кода. None если код не был найден
+        """
+        _, self.image = self.cap.read()
+
         if self.image is None:
             return None, None, None, None
 
