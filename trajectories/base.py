@@ -11,6 +11,15 @@ class Trajectory:
         pass
 
     def drive_to_marker(self, target_marker_id: int, target_area: int, reverse: bool = False, ranges: tuple[int, int] = (250, 350), camera: Camera = None):
+        """Функция езды до маркера.
+
+        Args:
+            target_marker_id (int): ID маркера, до которого едем
+            target_area (int): До какой площади маркера робот едет
+            reverse (bool, optional): Езда назад. По-умолчанию False (едем вперёд).
+            ranges (tuple[int, int], optional): диапазон отклонения маркера по координате X. По-умолчанию (250, 350).
+            camera (Camera, optional): С какой камеры читаем маркер. По умолчанию с той камеры, что указали при создании класса.
+        """
         if not camera:
             camera = self.camera
         
