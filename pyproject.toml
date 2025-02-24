@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "debugpy>=1.8.12",
+    "fastapi[standard]>=0.115.8",
     "opencv-python>=4.11.0.86",
     "pyserial>=3.5",
 ]
