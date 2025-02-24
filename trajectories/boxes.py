@@ -3,7 +3,8 @@ import time
 from trajectories.base import Trajectory
 
 class BoxesTrajectory(Trajectory):
-    def __init__(self, camera, camera_qr, camera_grab):
+    def __init__(self, camera, camera_qr, camera_grab, data):
+        self.data = data
         if not camera_grab or not camera_qr:
             raise FileNotFoundError("не найдены камеры захвата и qr")
         
@@ -15,21 +16,46 @@ class BoxesTrajectory(Trajectory):
         self.drive_to_qr_code()
 
     def drive_to_qr_code(self):
+        count = 0
+
         while True:
             _, data, _, _ = self.camera_qr.read_qr()
 
-            if not data:
+            if data is None:
                 arduino.write("MF:20;")
                 continue
-
-            arduino.write("MS:0;")
-            self.grab_lower_part()
-
-            arduino.write("PG:500;")
-            time.sleep(4)
             
+            count += 1
+            if data in self.data:
+                self.grab_lower_part()
+                return
+            else:
+                break
+
+        arduino.write("PG:430;")
+        time.sleep(3)
+        
+        while True:
             _, data, _, _ = self.camera_grab.read_qr()
-            self.grab_higher_part()
+
+            if data is None:
+                break
+
+            if data in self.data:
+                self.grab_higher_part()
+                return
+            else:
+                break
+        
+
+        arduino.write("MS:0;")
+        self.grab_lower_part()
+
+        arduino.write("PG:500;")
+        time.sleep(4)
+            
+        _, data, _, _ = self.camera_grab.read_qr()
+        self.grab_higher_part()
         
     def grab_lower_part(self):
         arduino.write("PG:140;")
