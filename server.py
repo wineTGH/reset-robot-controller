@@ -1,5 +1,6 @@
 from fastapi import BackgroundTasks, FastAPI
 from pydantic import BaseModel
+from state import order_items
 import main
 
 app = FastAPI()
@@ -9,5 +10,7 @@ class Items(BaseModel):
 
 @app.post("/run")
 def run(items: Items, tasks: BackgroundTasks):
-    tasks.add_task(main.task, items.items)
+    order_items.extend(items.items)
+    
+    tasks.add_task(main.task)
     return {"message": "success"}

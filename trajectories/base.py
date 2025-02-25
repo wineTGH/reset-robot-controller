@@ -7,7 +7,7 @@ class Trajectory:
         self.camera_qr = camera_qr
         self.camera_grab = camera_grab
 
-    def run(self):
+    def run(self) -> bool:
         pass
 
     def drive_to_marker(self, target_marker_id: int, target_area: int, reverse: bool = False, ranges: tuple[int, int] = (250, 350), camera: Camera = None):

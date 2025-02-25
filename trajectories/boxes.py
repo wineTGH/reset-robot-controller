@@ -1,19 +1,19 @@
 from arduino import arduino, servo
 import time
+import state
 from trajectories.base import Trajectory
 
 class BoxesTrajectory(Trajectory):
-    def __init__(self, camera, camera_qr, camera_grab, data):
-        self.data = data
+    def __init__(self, camera, camera_qr, camera_grab):
         if not camera_grab or not camera_qr:
             raise FileNotFoundError("не найдены камеры захвата и qr")
         
         super().__init__(camera, camera_qr, camera_grab)
 
-    def run(self):
+    def run(self) -> bool:
         arduino.write("PG:140;")
         time.sleep(1)
-        self.drive_to_qr_code()
+        return self.drive_to_qr_code()
 
     def drive_to_qr_code(self):
         count = 0
@@ -26,36 +26,21 @@ class BoxesTrajectory(Trajectory):
                 continue
             
             count += 1
-            if data in self.data:
-                self.grab_lower_part()
-                return
-            else:
-                break
-
-        arduino.write("PG:430;")
-        time.sleep(3)
-        
-        while True:
-            _, data, _, _ = self.camera_grab.read_qr()
-
-            if data is None:
-                break
-
-            if data in self.data:
-                self.grab_higher_part()
-                return
-            else:
-                break
-        
-
-        arduino.write("MS:0;")
-        self.grab_lower_part()
-
-        arduino.write("PG:500;")
-        time.sleep(4)
+            arduino.write("MS:0;")
+            is_loaded = self.handle_box()
+            if is_loaded:
+                return True
             
-        _, data, _, _ = self.camera_grab.read_qr()
-        self.grab_higher_part()
+            if count == 3:
+                arduino.write("MY:-180;")
+                time.sleep(2)
+            else:
+                arduino.write("MF:20;")
+                time.sleep(2)
+
+            if count == 6:
+                return False
+        
         
     def grab_lower_part(self):
         arduino.write("PG:140;")
@@ -79,3 +64,24 @@ class BoxesTrajectory(Trajectory):
         time.sleep(10)
         servo.write("PB;")
         arduino.write("PA:0;")
+
+    def handle_box(self):
+        _, data, _, _ = self.camera_qr.read_qr()
+
+        if data.lower() in state.order_items:
+            self.grab_lower_part()
+            state.order_items.remove(data.lower())
+            return True
+        
+        arduino.write("PG:430;")
+        time.sleep(2)
+        _, data, _, _ = self.camera_grab.read_qr()
+
+        if data.lower() in state.order_items:
+            self.grab_higher_part()
+            state.order_items.remove(data.lower())
+            return True
+        
+        arduino.write("PG:140;")
+        time.sleep(1)
+        return False
