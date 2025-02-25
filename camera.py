@@ -4,7 +4,7 @@ from cv2.typing import MatLike
 
 
 class Camera:
-    def __init__(self, id: int, name: str = "camera"):
+    def __init__(self, id: int | str, name: str = "camera"):
         self.name = name
         self.cap = cv.VideoCapture(id)
         self.cap.set(cv.CAP_PROP_FRAME_WIDTH, 640)
