@@ -21,6 +21,7 @@ class BoxesTrajectory(Trajectory):
         while True:
             _, data, _, _ = self.camera_qr.read_qr()
 
+            # если мы не увидели QR код, то продолжаем двигаться
             if data is None:
                 arduino.write("MF:20;")
                 continue
@@ -31,10 +32,12 @@ class BoxesTrajectory(Trajectory):
             if is_loaded:
                 return True
             
+            # если проехали три ящика и ничего не нашли, разворачиваемся
             if count == 3:
                 arduino.write("MY:-180;")
                 time.sleep(2)
             else:
+                # Отъезжаем от QR кода, чтобы камера его снова не прочитала
                 arduino.write("MF:20;")
                 time.sleep(2)
 
@@ -67,21 +70,35 @@ class BoxesTrajectory(Trajectory):
 
     def handle_box(self):
         _, data, _, _ = self.camera_qr.read_qr()
-
+        # Если товар с нижнего QR-кода есть в списке заказных товаров, то берём его
         if data.lower() in state.order_items:
             self.grab_lower_part()
+
+            # вычеркиваем товар из списка
             state.order_items.remove(data.lower())
             return True
         
-        arduino.write("PG:430;")
+        #* эта часть кода выполнится, только если на первой полке ничего нет *#
+
+        # Поднимаем шаговик, чтобы посмотреть код сверху
+        #TODO: протестируете это кол-во шагов. Видит ли он код или нет
+        arduino.write("PG:500;")
         time.sleep(2)
         _, data, _, _ = self.camera_grab.read_qr()
 
+        # Если товар с нижнего QR-кода есть в списке заказных товаров, то берём его
         if data.lower() in state.order_items:
             self.grab_higher_part()
+
+            # вычеркиваем товар из списка
             state.order_items.remove(data.lower())
             return True
         
+        #* этот код выполнится только если и на первой и на второй полке нет ничего нам нужного *#
+
+        # Убираем шаговик в предыдущие состояние
         arduino.write("PG:140;")
         time.sleep(1)
+
+        # Говорим, что ничего не собрали
         return False
