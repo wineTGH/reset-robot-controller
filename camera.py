@@ -114,6 +114,22 @@ class Camera:
         return self.image, data, x, area
     
     def detect_color_area(self, color_low: list[int], color_high: list[int], min_area: int = 1_000):
+        """
+        Фукнция чтение цветовой метки
+        
+        Аргументы:
+        ----------
+            - color_low (list[int]): Нижняя граница цветов
+            - color_high (list[int]): Верхняя граница цветов
+            - min_area (list[int], optional): минимальная площадь цветовой метки. Если площадь метки меньше минимального значение, 
+            мы её игнорируем. 
+
+        Возвращает:
+        ----------
+            - image (MatLike | None): изображение с камеры. None если камера не вернула изображение
+            - x (int | None): Центр цветовой метки по координате X. None если метка не была найдена
+            - area (int | None): Площадь цветовой метки по координате X. None если метка не была найдена
+        """
         _, self.image = self.cap.read()
 
         if self.image is None:
