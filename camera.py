@@ -112,6 +112,44 @@ class Camera:
         x = int(moments["m10"] / moments["m00"]) if moments["m00"] != 0 else 320
 
         return self.image, data, x, area
+    
+    def detect_color_area(self, color_low: list[int], color_high: list[int], min_area: int = 1_000):
+        _, self.image = self.cap.read()
+
+        if self.image is None:
+            return None, None, None
+        
+        g_frame = cv.cvtColor(self.image, cv.COLOR_BGR2LAB)
+        g_frame = cv.GaussianBlur(g_frame, (9, 9), 3)
+        g_frame = cv.inRange(
+            g_frame,
+            color_low,
+            color_high,
+        )
+
+        cnt, h = cv.findContours(g_frame, 1, cv.CHAIN_APPROX_SIMPLE)
+        if len(cnt) == 0:
+            self.show_image()
+            return self.image, None, None
+        
+        cnt = max(cnt, key=cv.contourArea)
+        area = cv.contourArea(cnt)
+        if area < min_area:
+            self.show_image()
+            return self.image, None, None
+        
+        approx = cv.convexHull(cnt)
+        rect = cv.minAreaRect(approx)
+        box = cv.boxPoints(rect)
+
+        cv.drawContours(self.image, [box.astype(int)], 0, (0, 0, 255), 2)
+        cv.drawContours(self.image, [approx.astype(int)], 0, (255, 255, 0), 2)
+        self.show_image()
+
+        moments = cv.moments(box)
+        x = int(moments["m10"] / moments["m00"]) if moments["m00"] != 0 else 320
+        return self.image, x, area
+        
 
     def show_image(self):
         if self.image is not None:
