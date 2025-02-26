@@ -113,7 +113,7 @@ class Camera:
 
         return self.image, data, x, area
     
-    def detect_color_area(self, color_low: list[int], color_high: list[int], min_area: int = 1_000):
+    def detect_color_area(self, color: dict, min_area: int = 1_000):
         """
         Фукнция чтение цветовой метки
         
@@ -121,8 +121,7 @@ class Camera:
         ----------
             - color_low (list[int]): Нижняя граница цветов
             - color_high (list[int]): Верхняя граница цветов
-            - min_area (list[int], optional): минимальная площадь цветовой метки. Если площадь метки меньше минимального значение, 
-            мы её игнорируем. 
+            - min_area (list[int], optional): минимальная площадь цветовой метки. Если площадь метки меньше минимального значение, мы её игнорируем. 
 
         Возвращает:
         ----------
@@ -139,8 +138,8 @@ class Camera:
         g_frame = cv.GaussianBlur(g_frame, (9, 9), 3)
         g_frame = cv.inRange(
             g_frame,
-            color_low,
-            color_high,
+            color['low'],
+            color['high'],
         )
 
         cnt, h = cv.findContours(g_frame, 1, cv.CHAIN_APPROX_SIMPLE)

@@ -16,7 +16,7 @@ class BoxesTrajectory(Trajectory):
         return self.drive_to_qr_code()
 
     def drive_to_qr_code(self):
-        count = 0
+        self.count = 0
 
         while True:
             _, data, _, _ = self.camera_qr.read_qr()
@@ -26,14 +26,14 @@ class BoxesTrajectory(Trajectory):
                 arduino.write("MF:20;")
                 continue
             
-            count += 1
+            self.count += 1
             arduino.write("MS:0;")
             is_loaded = self.handle_box()
             if is_loaded:
                 return True
             
             # если проехали три ящика и ничего не нашли, разворачиваемся
-            if count == 3:
+            if self.count == 3:
                 arduino.write("MY:-180;")
                 time.sleep(2)
             else:
@@ -41,7 +41,7 @@ class BoxesTrajectory(Trajectory):
                 arduino.write("MF:20;")
                 time.sleep(2)
 
-            if count == 6:
+            if self.count == 6:
                 return False
         
         
@@ -58,6 +58,31 @@ class BoxesTrajectory(Trajectory):
         time.sleep(16)
         arduino.write("PG:430;")
         time.sleep(4)
+        while True:
+            _, _, _, area = self.camera_qr.read_qr()
+            if area is None:
+                arduino.write("MS:0;")
+                break
+
+            if area > 1_000:
+                arduino.write("MR:20;" if self.count < 3 else "ML:20;")
+            else:
+                arduino.write("MS:0;")
+                break
+        
+        while True:
+            _, x, _ = self.camera_grab.detect_color_area(state.colors['зелёный'])
+            if x is None:
+                break
+
+            if x < 250:
+                arduino.write("MF:25;")
+            elif x > 350:
+                arduino.write("MB:25;")
+            else:
+                arduino.write("MS:0;")
+                break
+        
         servo.write("GO;")
         time.sleep(2)
         servo.write("PF;")

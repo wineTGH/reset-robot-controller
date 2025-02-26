@@ -1,4 +1,5 @@
 order_items = []
+boxes = "left"
 
 def read_colors_config():
     with open("colors.txt", "r") as f:
