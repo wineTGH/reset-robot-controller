@@ -1,16 +1,18 @@
 from fastapi import BackgroundTasks, FastAPI
 from pydantic import BaseModel
-from state import order_items
+import state
 import main
 
 app = FastAPI()
 
-class Items(BaseModel):
+class Order(BaseModel):
     items: list[str]
+    boxes: str
 
 @app.post("/run")
-def run(items: Items, tasks: BackgroundTasks):
-    order_items.extend(items.items)
+def run(order: Order, tasks: BackgroundTasks):
+    # order_items.extend(order.items)
+    state.boxes = order.boxes
     
     tasks.add_task(main.task)
     return {"message": "success"}

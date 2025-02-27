@@ -1,11 +1,8 @@
 from camera import Camera
 from trajectories import StartToCenterTrajectory, BoxesTrajectory, FirstBoxesToFinish
-import time
 
-time.sleep(30)
-
-def task(items: list[str]):
-
+#! Это не удалять! Просто копируй камеры к закомментированному циклу
+def task():
     camera_move = Camera(2, "move")
 
     camera_qr = Camera(6, "qr")
